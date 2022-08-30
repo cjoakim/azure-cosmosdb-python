@@ -1,7 +1,8 @@
 """
 Usage:
   python main.py <func>
-  python main.py 
+  python main.py env         <-- displays necessary environment variables
+  python main.py cosmos_sql  <-- executes a suite of CosmosDB SQL API operations
 Options:
   -h --help     Show this screen.
   --version     Show version.
@@ -32,12 +33,11 @@ def print_options(msg):
     print(arguments)
 
 def check_env():
-    print("check_env:")
-    print('AZURE_COSMOSDB_SQLDB_URI: {}'.format(Env.var('AZURE_COSMOSDB_SQLDB_URI')))
-    print('AZURE_COSMOSDB_SQLDB_KEY: {}'.format(Env.var('AZURE_COSMOSDB_SQLDB_KEY')))
+    print('AZURE_COSMOSDB_SQL_URI:     {}'.format(Env.var('AZURE_COSMOSDB_SQL_URI')))
+    print('AZURE_COSMOSDB_SQL_RW_KEY1: {}'.format(Env.var('AZURE_COSMOSDB_SQL_RW_KEY1')))
+    print('AZURE_COSMOSDB_SQL_DB:      {}'.format(Env.var('AZURE_COSMOSDB_SQL_DB')))
 
 def check_fs():
-    print("check_fs:")
     pwd = FS.pwd()
     print('pwd: {}'.format(pwd))
     files = FS.walk(pwd)
@@ -58,8 +58,7 @@ def check_fs():
         if idx < 5:
             print(obj)
 
-def check_mongo():
-    print("check_mongo:")
+def check_cosmos_mongo():
     opts = dict()
     opts['host'] = 'localhost'
     opts['port'] = 27017
@@ -106,14 +105,14 @@ def check_mongo():
     print(m.delete_many({"doctype": 'movie'}))
     print(m.count_docs({}))
 
-def check_cosmos():
-    print("check_cosmos:")
+def check_cosmos_sql():
     opts = dict()
-    opts['url'] = Env.var('AZURE_COSMOSDB_SQLDB_URI')
-    opts['key'] = Env.var('AZURE_COSMOSDB_SQLDB_KEY')
-    dbname, cname = 'dev', 'smoke_test'
+    opts['url'] = Env.var('AZURE_COSMOSDB_SQL_URI')
+    opts['key'] = Env.var('AZURE_COSMOSDB_SQL_RW_KEY1')
+    dbname = Env.var('AZURE_COSMOSDB_SQL_DB')
+    cname  = 'testing'  # cname is container name
 
-    c = Cosmos(opts)
+    c = Cosmos(opts)    # see file pysrc/cosmos.py in this repo for my Cosmos wrapper class
 
     print('disable/enable metrics, print_record_diagnostics:')
     c.disable_query_metrics()
@@ -209,25 +208,35 @@ def check_cosmos():
     c.reset_record_diagnostics()
     c.print_record_diagnostics()
 
-    print('delete container: not_there')
-    c.delete_container('not_there')
+    # Delete documents that are the results of a query
+    sql = "select * from c where c.pk in ('27013', '27016')"
+    print('query; sql: {}'.format(sql))
+    items = c.query_container(cname, sql, True, 1000)
     c.print_last_request_charge()
+    last_id, last_pk = None, None
+    for item in items:
+        print('deleting document:')
+        print(json.dumps(item, sort_keys=False, indent=2))
+        c.delete_doc(item, item['pk'])
 
-    print('delete container: {}'.format(cname))
-    c.delete_container(cname)
-    c.print_last_request_charge()
+    # print('delete container: {}'.format(cname))
+    # c.delete_container(cname)
+    # c.print_last_request_charge()
 
 
 if __name__ == "__main__":
-    cli_func = sys.argv[1].lower()
+    if len(sys.argv) > 1:
+        cli_func = sys.argv[1].lower()
 
-    if cli_func == 'cosmos':
-        check_cosmos()
-    elif cli_func == 'env':
-        check_env()
-    elif cli_func == 'fs':
-        check_fs()
-    elif cli_func == 'mongo':
-        check_mongo()
+        if cli_func == 'env':
+            check_env()
+        elif cli_func == 'cosmos_sql':
+            check_cosmos_sql()
+        elif cli_func == 'fs':
+            check_fs()
+        elif cli_func == 'check_cosmos_mongo':
+            check_cosmos_mongo()
+        else:
+            print_options('Error: invalid command-line function: {}'.format(cli_func))
     else:
-        print_options('Error: invalid CLI function: {}'.format(cli_func))
+        print_options('Error: no command-line args provided') 

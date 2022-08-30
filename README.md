@@ -20,8 +20,9 @@ Set the following enviornment variables which point to your CosmosDB account(s):
 You can obtain these values from Azure Portal; see your CosmosDB SQL API account.
 
 ```
-AZURE_COSMOSDB_SQLDB_URI
-AZURE_COSMOSDB_SQLDB_KEY
+AZURE_COSMOSDB_SQL_URI        <-- your CosmosDB account URI
+AZURE_COSMOSDB_SQL_RW_KEY1    <-- your read-write key
+AZURE_COSMOSDB_SQL_DB         <-- your database name
 ```
 
 #### Mongo API:
@@ -72,6 +73,57 @@ six             1.15.0
 tomli           2.0.1
 urllib3         1.26.3
 wheel           0.37.1
+
+
+(venv) PS ...\azure-cosmosdb-python> python .\main.py
+Error: no command-line args provided
+Usage:
+  python main.py <func>
+  python main.py env         <-- displays necessary environment variables
+  python main.py cosmos      <-- executes a suite of CosmosDB SQL API operations
+Options:
+  -h --help     Show this screen.
+  --version     Show version.
+  
+(venv) PS ...\azure-cosmosdb-python> python .\main.py env 
+
+(venv) PS ...\azure-cosmosdb-python> python .\main.py cosmos_sql 
+
+...
+deleting document:
+{
+  "postal_cd": "27013",
+  "country_cd": "US",
+  "city_name": "Cleveland",
+  "state_abbrv": "NC",
+  "latitude": "35.7634680000",
+  "longitude": "-80.7037300000",
+  "pk": "27013",
+  "id": "2d7087a8-62a4-45a8-adc9-43920cc2871c",
+  "_rid": "gklzANDudqYHAAAAAAAAAA==",
+  "_self": "dbs/gklzAA==/colls/gklzANDudqY=/docs/gklzANDudqYHAAAAAAAAAA==/",
+  "_etag": "\"24008f89-0000-0100-0000-630e258a0000\"",
+  "_attachments": "attachments/",
+  "updated": true,
+  "_ts": 1661871498
+}
+deleting document:
+{
+  "postal_cd": "27016",
+  "country_cd": "US",
+  "city_name": "Danbury",
+  "state_abbrv": "NC",
+  "latitude": "36.4445880000",
+  "longitude": "-80.2165700000",
+  "pk": "27016",
+  "id": "7c6db266-1429-4949-a4ee-cff96d911956",
+  "_rid": "gklzANDudqYJAAAAAAAAAA==",
+  "_self": "dbs/gklzAA==/colls/gklzANDudqY=/docs/gklzANDudqYJAAAAAAAAAA==/",
+  "_etag": "\"24009189-0000-0100-0000-630e258a0000\"",
+  "_attachments": "attachments/",
+  "updated": true,
+  "_ts": 1661871498
+}
 ```
 
 --- 
