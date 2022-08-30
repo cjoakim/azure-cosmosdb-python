@@ -17,14 +17,19 @@ Set the following enviornment variables which point to your CosmosDB account(s):
 
 #### SQL API:
 
-```
+You can obtain these values from Azure Portal; see your CosmosDB SQL API account.
 
+```
+AZURE_COSMOSDB_SQLDB_URI
+AZURE_COSMOSDB_SQLDB_KEY
 ```
 
 #### Mongo API:
 
-```
+You can obtain these values from Azure Portal; see your CosmosDB Mongo API account.
 
+```
+TODO - complete this section
 ```
 
 ## Clone this Repo, create Python Virtual Environment
